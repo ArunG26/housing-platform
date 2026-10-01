@@ -9,8 +9,22 @@ RUN gradle clean bootJar --no-daemon
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-RUN useradd --create-home --uid 10001 appuser
-COPY --from=build --chown=appuser:appuser /workspace/build/libs/market-service-1.1.0.jar app.jar
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --uid 10001 appuser
+
+COPY --from=build \
+    --chown=appuser:appuser \
+    /workspace/build/libs/market-service.jar \
+    /app/app.jar
+
 USER appuser
 EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=3s --start-period=15s --retries=3 \
+    CMD curl --fail --silent --show-error \
+    http://127.0.0.1:8080/actuator/health/readiness \
+    > /dev/null || exit 1
+
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

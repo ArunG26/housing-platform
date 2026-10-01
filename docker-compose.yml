@@ -10,11 +10,6 @@ services:
       ESTIMATOR_ML_TOKEN: ${ESTIMATOR_ML_TOKEN:?ESTIMATOR_ML_TOKEN is required}
       MARKET_ML_TOKEN: ${MARKET_ML_TOKEN:?MARKET_ML_TOKEN is required}
       MAX_BATCH_SIZE: "100"
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready')"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
 
   estimator-service:
     build: ./estimator-service
@@ -69,5 +64,7 @@ services:
       DEMO_ANALYST_USERNAME: ${DEMO_ANALYST_USERNAME:?DEMO_ANALYST_USERNAME is required}
       DEMO_ANALYST_PASSWORD: ${DEMO_ANALYST_PASSWORD:?DEMO_ANALYST_PASSWORD is required}
     depends_on:
-      - estimator-service
-      - market-service
+      estimator-service:
+        condition: service_healthy
+      market-service:
+        condition: service_healthy
