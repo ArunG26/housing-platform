@@ -138,13 +138,11 @@ export function MarketDashboard({
             <h1 className="text-3xl font-semibold tracking-tight">Property Market Analysis</h1>
             <p className="mt-2 max-w-3xl text-slate-600">Server-loaded market aggregates, filtered analytics, model-backed what-if scenarios, cached Java calculations and exportable data.</p>
           </div>
-          {canAnalyze ? (
+          {canAnalyze && (
             <div className="flex gap-2">
               <a href={`/api/market/export/csv?${exportQuery}`} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-slate-900">Export CSV</a>
               <a href={`/api/market/export/pdf?${exportQuery}`} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white focus-visible:outline-2 focus-visible:outline-slate-900">Export PDF</a>
             </div>
-          ) : (
-            <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">ANALYST role is required for exports and what-if analysis.</p>
           )}
         </div>
       </section>
@@ -239,12 +237,10 @@ export function MarketDashboard({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      {canAnalyze && (<section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-semibold">What-if analysis</h2>
         <p className="mt-1 text-sm text-slate-500">The Java service sends baseline and scenario together to the ML batch endpoint, keeping both predictions on one model version.</p>
-        {!canAnalyze ? (
-          <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm text-slate-600">Your VIEWER role can explore market data, but ANALYST authorization is required to run predictive scenarios.</p>
-        ) : !selected || !scenario ? <p className="mt-5 text-slate-500">Select a property first.</p> : (
+        {!selected || !scenario ? <p className="mt-5 text-slate-500">Select a property first.</p> : (
           <form onSubmit={runWhatIf} className="mt-5">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <ScenarioInput label="Square footage" value={scenario.square_footage} onChange={(value) => setScenario({ ...scenario, square_footage: value })}/>
@@ -266,7 +262,7 @@ export function MarketDashboard({
             )}
           </form>
         )}
-      </section>
+      </section>)}
     </div>
   );
 }
