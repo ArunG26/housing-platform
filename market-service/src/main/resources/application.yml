@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: market-service
+    version: ${SERVICE_VERSION:1.1.0}
+  cache:
+    type: caffeine
+    cache-names: marketAnalysis
+    caffeine:
+      spec: maximumSize=200,expireAfterWrite=10m
+
+platform:
+  version: ${PLATFORM_VERSION:1.1.0}
+
+environment: ${ENVIRONMENT:local}
+
+security:
+  bff-token: ${BFF_INTERNAL_TOKEN:replace-with-bff-token}
+
+ml-service:
+  base-url: ${ML_SERVICE_URL:http://localhost:8000}
+  token: ${MARKET_ML_TOKEN:replace-with-market-ml-token}
+  connect-timeout-ms: ${ML_CONNECT_TIMEOUT_MS:2000}
+  read-timeout-ms: ${ML_READ_TIMEOUT_MS:5000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,marketData
+
+logging:
+  structured:
+    format:
+      console: logstash
+    json:
+      add:
+        service: market-service
+        environment: ${ENVIRONMENT:local}
+        service_version: ${SERVICE_VERSION:1.1.0}
+        platform_version: ${PLATFORM_VERSION:1.1.0}
+      rename:
+        "@timestamp": timestamp

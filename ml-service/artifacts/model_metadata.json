@@ -1,0 +1,87 @@
+{
+  "model_name": "housing-price-ridge-regression",
+  "model_type": "RidgeRegression",
+  "model_version": "1.0.0",
+  "trained_at_utc": "2026-09-25T16:43:53.242562+00:00",
+  "training_dataset": {
+    "file_name": "House Price Dataset.csv",
+    "sha256": "0e36c6224e1f6fb97c308c9dbe1d6da22d78d78055181067f8ac4c7155a4a726",
+    "row_count": 50,
+    "target": "price",
+    "excluded_columns": [
+      "id"
+    ]
+  },
+  "features": [
+    "square_footage",
+    "bedrooms",
+    "bathrooms",
+    "year_built",
+    "lot_size",
+    "distance_to_city_center",
+    "school_rating"
+  ],
+  "feature_ranges": {
+    "square_footage": {
+      "min": 980.0,
+      "max": 2400.0
+    },
+    "bedrooms": {
+      "min": 2.0,
+      "max": 4.0
+    },
+    "bathrooms": {
+      "min": 1.0,
+      "max": 3.0
+    },
+    "year_built": {
+      "min": 1978.0,
+      "max": 2012.0
+    },
+    "lot_size": {
+      "min": 4400.0,
+      "max": 10500.0
+    },
+    "distance_to_city_center": {
+      "min": 2.1,
+      "max": 8.2
+    },
+    "school_rating": {
+      "min": 6.5,
+      "max": 9.1
+    }
+  },
+  "hyperparameters": {
+    "alpha": 0.3,
+    "standardize_features": true,
+    "selection_metric": "RMSE",
+    "selection_cv_folds": 5,
+    "random_state": 42
+  },
+  "performance": {
+    "holdout_fraction": 0.2,
+    "holdout_rows": 10,
+    "holdout_metrics": {
+      "mae": 7382.502708323358,
+      "rmse": 7841.940805683634,
+      "r2": 0.9890092425539795
+    },
+    "selection_cv_rmse": 10316.344886249917
+  },
+  "coefficients": {
+    "square_footage": -19.92746669089901,
+    "bedrooms": -873.0782058533496,
+    "bathrooms": 14574.214011166723,
+    "year_built": -652.2414870553482,
+    "lot_size": 21.6213260472758,
+    "distance_to_city_center": 16151.228605369466,
+    "school_rating": 16850.070996941802
+  },
+  "coefficient_basis": "original_feature_units",
+  "intercept": 1213749.5767993745,
+  "library_versions": {
+    "scikit_learn": "1.8.0",
+    "pandas": "2.2.3",
+    "joblib": "1.5.3"
+  }
+}

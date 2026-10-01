@@ -1,0 +1,73 @@
+services:
+  ml-service:
+    build: ./ml-service
+    ports:
+      - "8000:8000"
+    environment:
+      ENVIRONMENT: local
+      SERVICE_VERSION: "1.1.0"
+      PLATFORM_VERSION: "1.1.0"
+      ESTIMATOR_ML_TOKEN: ${ESTIMATOR_ML_TOKEN:?ESTIMATOR_ML_TOKEN is required}
+      MARKET_ML_TOKEN: ${MARKET_ML_TOKEN:?MARKET_ML_TOKEN is required}
+      MAX_BATCH_SIZE: "100"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  estimator-service:
+    build: ./estimator-service
+    ports:
+      - "8001:8001"
+    environment:
+      ENVIRONMENT: local
+      SERVICE_VERSION: "1.1.0"
+      PLATFORM_VERSION: "1.1.0"
+      BFF_INTERNAL_TOKEN: ${BFF_INTERNAL_TOKEN:?BFF_INTERNAL_TOKEN is required}
+      ML_SERVICE_URL: http://ml-service:8000
+      ESTIMATOR_ML_TOKEN: ${ESTIMATOR_ML_TOKEN:?ESTIMATOR_ML_TOKEN is required}
+      ML_CONNECT_TIMEOUT_SECONDS: "2"
+      ML_READ_TIMEOUT_SECONDS: "5"
+    depends_on:
+      ml-service:
+        condition: service_healthy
+
+  market-service:
+    build: ./market-service
+    ports:
+      - "8080:8080"
+    environment:
+      ENVIRONMENT: local
+      SERVICE_VERSION: "1.1.0"
+      PLATFORM_VERSION: "1.1.0"
+      BFF_INTERNAL_TOKEN: ${BFF_INTERNAL_TOKEN:?BFF_INTERNAL_TOKEN is required}
+      ML_SERVICE_URL: http://ml-service:8000
+      MARKET_ML_TOKEN: ${MARKET_ML_TOKEN:?MARKET_ML_TOKEN is required}
+      ML_CONNECT_TIMEOUT_MS: "2000"
+      ML_READ_TIMEOUT_MS: "5000"
+    depends_on:
+      ml-service:
+        condition: service_healthy
+
+  portal:
+    build: ./portal
+    ports:
+      - "3000:3000"
+    environment:
+      ENVIRONMENT: local
+      SERVICE_VERSION: "1.1.0"
+      PLATFORM_VERSION: "1.1.0"
+      ESTIMATOR_SERVICE_URL: http://estimator-service:8001
+      MARKET_SERVICE_URL: http://market-service:8080
+      BFF_INTERNAL_TOKEN: ${BFF_INTERNAL_TOKEN:?BFF_INTERNAL_TOKEN is required}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET is required}
+
+      DEMO_VIEWER_USERNAME: ${DEMO_VIEWER_USERNAME:?DEMO_VIEWER_USERNAME is required}
+      DEMO_VIEWER_PASSWORD: ${DEMO_VIEWER_PASSWORD:?DEMO_VIEWER_PASSWORD is required}
+
+      DEMO_ANALYST_USERNAME: ${DEMO_ANALYST_USERNAME:?DEMO_ANALYST_USERNAME is required}
+      DEMO_ANALYST_PASSWORD: ${DEMO_ANALYST_PASSWORD:?DEMO_ANALYST_PASSWORD is required}
+    depends_on:
+      - estimator-service
+      - market-service
